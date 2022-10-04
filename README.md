@@ -1,6 +1,6 @@
 # Python Starter for *Computational Physics 2022*
 Dear Students, \
-welcome to the accompanying Python repository of the Computational Physics course of 2021.
+welcome to the accompanying Python repository of the Computational Physics course of 2022.
 
 You can use this Git repository as an 'upstream remote' (more on that later) while completing the course - as all the necessary information and data will be provided here, as well as in the TeachCenter.
 
