@@ -18,14 +18,14 @@ And work together on the same set of files with multiple people, simultaneously.
 
 **The first step** for using this repository is to **fork** it (button on the top right). This essentially creates a copy of the whole repo. You *must* set the visibility level to "**Private**" since you will complete the assignments on your own, or in groups (confer below).
 
-You should now have a repository with the path `gitlab.tugraz.at/[Your User ID]/computational-physics-in-python-2021`.
+You should now have a repository with the path `gitlab.tugraz.at/[Your User ID]/computational-physics-in-python-2022`.
 Of course, you may rename it as you deem fitting, since it is now your own.
 
 You may also **use your forked repo for handing in the assignments**, instead of the TeachCenter.
 - Please leave a note in the corresponding deliverable ('Abgabe') on TeachCenter, linking to your TUGraz GitLab repository.
 - As soon as you have your own repository (from forking the main one), from there please go to 'Project Information' -> 'Members' -> 'Invite Group'.
-- Invite a group named "Computational Physics", which comprises the assessment team of Professors and Tutors.
-- If you want to work in teams, you may invite your colleagues (up to 5 per group) to the repository. Do this via 'Project Information' -> 'Members' -> 'Invite per Mail'. Use the 'Maintainer' role.
+- Invite the assessment team of Professors and Tutors.
+- If you want to work in teams, you may invite your colleagues (up to 3 per group) to the repository. Do this via 'Project Information' -> 'Members' -> 'Invite per Mail'. Use the 'Maintainer' role.
 - In case you want to switch back to using the TeachCenter for some reason, simply ZIP the project folder as usual and upload it to the TC.
 
 ### Cloning the repository for local use
