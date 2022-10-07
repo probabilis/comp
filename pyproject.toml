@@ -1,0 +1,17 @@
+[project]
+name = "computational-physics-2022"
+description = "Solutions for the assignments of the course."
+authors = [
+    "Friedrich Nietzsche <nietzsche@ietf.org>"
+]
+python = "^3.8"
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+
+[tool.pylint.MASTER]
+max-line-length = 120
+
+[tool.pylint.messages_control]
+disable = ["invalid-name", "too-many-locals"]
