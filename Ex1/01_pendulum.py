@@ -10,7 +10,7 @@ def runge_Kutta(t0, y0, t, eps):
     # Iterate for number of iterations
     y = y0
     for i in range(1, n + 1):
-        "Apply Runge Kutta Formula for finding next value of y"
+        "Apply Runge Kutta algorithm for finding next y"
         #a_ij, c_j and b_j from Butcher tableau 
         k1 = eps * dydt(y, t)
         k2 = eps * dydt(y + 0.5 * k1, t0 + 0.5 * eps)
@@ -27,17 +27,18 @@ def runge_Kutta(t0, y0, t, eps):
 t0 = 0
 y = 1
 t = 2
-eps = 0.2
+eps = 0.1
 
 #function handling
-
-input_de = input('Write a formula involving t,y : dydt = ')
+#example: y'(t) = dy/dt = y + t**2
+input_de = input('Write a differential equation of 1th order involving t and y: dydt = ')
 
 def dydt(y, t):
     return eval(input_de)
 
-def RK_solver():
-    print('The value of y at t for the differential equation dydt =', input_de, 'is:', runge_Kutta(t0, y, t, eps))
+def RK_solver(t0 = t0, t = t, y = y, eps = eps):
+    print('The value of y at t for the differential equation dydt =', input_de, 'is: {0:.3f}'.format(runge_Kutta(t0, y, t, eps)))
     return
 
+#calling function
 RK_solver()
