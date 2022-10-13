@@ -171,9 +171,8 @@ plt.show
 #plot for Theta(t) with RK4-routine for a long time-vektor
 
 
-import scipy as sy
-from scipy.fft import fft
-import scipy.fftpack as syfp
+from scipy.fft import fft, fftfreq
+from scipy.signal import blackman
 
 
 
@@ -181,30 +180,32 @@ fig, axs = plt.subplots(2, figsize = (8,10))
 
 t0 = 0
 y0 = np.array([np.pi/3, 0])
-t_max = 50
+t_max = 100
 eps = 0.05
 
 y_rk4, t_rk4 = explicit_runge_kutta(hamiltonian, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
 
-FFT = fft(y_rk4)
-freqs = syfp.fftfreq(len(y_rk4), eps)
-
+N = len(t_rk4)
+yf = fft(y_rk4[0,:])
+xf = fftfreq(N, eps)[:N//2]
 
 axs[0].plot(t_rk4, y_rk4[0,:], label = 'RK4')
 
 axs[0].set_xlabel('time $t$ / s')
 axs[0].set_ylabel('$\\Theta$(t)')
 
-axs[1].plot(freqs, sy.log10(abs(FFT)), '.')
+axs[1].plot(xf, 2.0/N * np.abs(yf[0:N//2]), color = 'lightblue')
 
-axs[1].set_xlabel('frequencies $\\omega$ / 1/s')
-axs[1].set_ylabel('$log_{10}$(|FFT|)')
+axs[1].set_xlabel('frequency $\\omega$ / $s^{-1}$')
+axs[1].set_ylabel('|FFT|')
 
 fig.suptitle('Resolve the swinging periodicity')
 fig.tight_layout()
 axs[0].legend()
 
 plt.show()
+
+
 
 
 
