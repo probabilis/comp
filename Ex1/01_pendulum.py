@@ -59,6 +59,12 @@ def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
         
     return y, t
 
+#############################################
+#############################################
+#############################################
+
+
+#1b
 
 def dfdt(f, t):
     l = 1
@@ -80,13 +86,15 @@ epsilon = 0.05
 y_rk4, t_rk4 = explicit_runge_kutta(dfdt, y0, t0, t_max, epsilon, a_rk4, b_rk4, c_rk4)
 y_eul, t_eul = explicit_runge_kutta(dfdt, y0, t0, t_max, epsilon, a_eul, b_eul, c_eul)
 
-plt.plot(t_eul, y_eul[0,:])
-plt.plot(t_rk4, y_rk4[0,:])
+plt.plot(t_eul, y_eul[0,:], label = 'Euler')
+plt.plot(t_rk4, y_rk4[0,:], label = 'RK4')
+plt.xlabel('time $t$ / s')
+plt.ylabel('$\\Theta(t)$')
+plt.legend()
+plt.title('Solving the pendulum differential equation')
 
-E_t_rk4 = 0.5*m*l**2*y_rk4[1,:]**2 + m*g*l*(1 - np.cos(y_rk4[0,:]))
-
-E_t_eul = 0.5*m*l**2*y_eul[1,:]**2 + m*g*l*(1 - np.cos(y_eul[0,:]))
-
+#E_t_rk4 = 0.5*m*l**2*y_rk4[1,:]**2 + m*g*l*(1 - np.cos(y_rk4[0,:]))
+#E_t_eul = 0.5*m*l**2*y_eul[1,:]**2 + m*g*l*(1 - np.cos(y_eul[0,:]))
 #plt.plot(t_rk4, E_t_rk4, color = 'skyblue')
 #plt.plot(t_eul, E_t_eul, color = 'crimson')
 
@@ -143,8 +151,8 @@ comparison_erk_eul(eps_list)
 
 for ax_top, ax_bot, i in zip(axs[0], axs[-1], eps_list):
     ax_top.set_title('$\\epsilon$={}'.format(i))
-    ax_bot.set_xlabel('$\\epsilon$={}'.format(i))
-axs[0,0].set_ylabel('$\\Theta$(t)')
+    ax_bot.set_xlabel('time $t$ / s'.format(i))
+axs[0,0].set_ylabel('$\\Theta(t)$')
 axs[1,0].set_ylabel('E(t)')
 
 
@@ -162,29 +170,41 @@ plt.show
 #1d
 #plot for Theta(t) with RK4-routine for a long time-vektor
 
+
 import scipy as sy
+from scipy.fft import fft
 import scipy.fftpack as syfp
 
-fig, axs = plt.subplots(1, 1, figsize = (8,10))
+
+
+fig, axs = plt.subplots(2, figsize = (8,10))
 
 t0 = 0
 y0 = np.array([np.pi/3, 0])
-t_max = 100
+t_max = 50
 eps = 0.05
 
 y_rk4, t_rk4 = explicit_runge_kutta(hamiltonian, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
 
-FFT = sy.fft(y_rk4)
+FFT = fft(y_rk4)
 freqs = syfp.fftfreq(len(y_rk4), eps)
 
 
-axs.plot(t_rk4, y_rk4[0,:], label = 'RK4')
+axs[0].plot(t_rk4, y_rk4[0,:], label = 'RK4')
+
+axs[0].set_xlabel('time $t$ / s')
+axs[0].set_ylabel('$\\Theta$(t)')
+
+axs[1].plot(freqs, sy.log10(abs(FFT)), '.')
+
+axs[1].set_xlabel('frequencies $\\omega$ / 1/s')
+axs[1].set_ylabel('$log_{10}$(|FFT|)')
+
 fig.suptitle('Resolve the swinging periodicity')
-#plt.plot(freqs, FFT)
-
 fig.tight_layout()
-axs.legend()
+axs[0].legend()
 
+plt.show()
 
 
 
