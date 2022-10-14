@@ -74,17 +74,20 @@ def dSdt(S, t):
     
     return np.array([theta_1_der, theta_2_der, p_tilde_1_der, p_tilde_2_der])
 
-
-m = 1
-l = 1
-g = 1
-
 # ---------------------------------
+t0 = 0 
+t_max = 100
+
+epsilon = 0.01
+###################################
+
+m = 1 ; l = 1 ; g = 1
+
 
 y0_A = np.array([0, 0, 4, 2])
-t0_A = 0
-t_max_A = 10
-epsilon_A = 0.01
+t0_A = t0
+t_max_A = t_max
+epsilon_A = epsilon
 
 y_A, t_A = explicit_runge_kutta(dSdt, y0_A, t0_A, t_max_A, epsilon_A, a_rk4, b_rk4, c_rk4)
 
@@ -94,9 +97,9 @@ theta_1_A, theta_2_A, p_1_A, p_2_A = y_A
 
 y0_B = np.array([0, 0, 0, 4])
 y0_B = np.array([1, 0, 0, 4])
-t0_B = 0
-t_max_B = 10
-epsilon_B = 0.01
+t0_B = t0
+t_max_B = t_max
+epsilon_B = epsilon
 
 y_B, t_B = explicit_runge_kutta(dSdt, y0_B, t0_B, t_max_B, epsilon_B, a_rk4, b_rk4, c_rk4)
 
@@ -148,50 +151,53 @@ def find_crossing_points(data1, data2):
                 else:
                     indices.append(i)
     return np.array(indices)
+    
+#############################################################################
 
 relevant_points_A = find_crossing_points(theta_2_A, p_2_A)
 relevant_points_B = find_crossing_points(theta_2_B, p_2_B)
 
-def annotate_axes(ax, text, fontsize=18):
+def annotate_axes(ax, text, fontsize=18, color="darkgrey"):
     ax.text(0.5, 0.5, text, transform=ax.transAxes,
             ha="center", va="center", fontsize=fontsize, color="darkgrey")
 
 fig = plt.figure(figsize=(8, 10), layout="constrained")
 spec = fig.add_gridspec(3, 2)
 
-ax1_A = fig.add_subplot(spec[0, :])
-annotate_axes(ax1_A, '$\\Theta(t_n)_A$ $\\tilde{p}_A(t_n)$')
 
-ax1_B = fig.add_subplot(spec[1, :])
-annotate_axes(ax1_B, '$\\Theta(t_n)_B$ $\\tilde{p}_B(t_n)$')
 
-ax2 = fig.add_subplot(spec[2, 0])
-annotate_axes(ax2, '$\\Theta_A(t)$')
+ax0 = fig.add_subplot(spec[0, 0])
+annotate_axes(ax0, '$\\Theta_A(t)$')
 
-ax3 = fig.add_subplot(spec[2, 1])
-annotate_axes(ax3, '$\\Theta_B(t)$')
+ax1 = fig.add_subplot(spec[0, 1])
+annotate_axes(ax1, '$\\Theta_B(t)$')
 
-ax1_A.plot(t_B, theta_1_A, color = 'midnightblue', label = '$\\Theta_A(t)$')
-ax1_A.plot(t_B, theta_2_A, color = 'mediumseagreen', label = '$\\tilde{p}_A(t_n)$')
+ax2_A = fig.add_subplot(spec[1, :])
+ax2_B = fig.add_subplot(spec[2, :])
 
-ax1_B.plot(t_B, theta_1_A, color = 'salmon', label = '$\\Theta_A(t)$')
-ax1_B.plot(t_B, theta_2_A, color = 'gold', label = '$\\tilde{p}_A(t_n)$')
-
-ax2.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
+ax0.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
          marker = 'o', markersize = 3, label = '$\\Theta_A(t)$', color = 'midnightblue')
 
-ax3.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
+ax1.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
          marker = 'o', markersize = 3, label = '$\\Theta_B(t)$', color = 'salmon')
 
+ax2_A.plot(t_B, theta_1_A, color = 'midnightblue', label = '$\\Theta_A(t)$')
+ax2_A.plot(t_B, theta_2_A, color = 'mediumseagreen', label = '$\\tilde{p}_A(t_n)$')
 
-ax1_A.set_xlabel('$t_n$') ; ax1_A.set_ylabel('$y(t_n)$')
-ax1_B.set_xlabel('$t_n$') ; ax1_B.set_ylabel('$y(t_n)$')
-
-ax2.set_xlabel('$\\Theta(t_n)_A$') ; ax2.set_ylabel('$\\tilde{p}_A(t_n)$')
-ax3.set_xlabel('$\\Theta(t_n)_B$') ; ax3.set_ylabel('$\\tilde{p}_B(t_n)$')
+ax2_B.plot(t_B, theta_1_A, color = 'salmon', label = '$\\Theta_B(t)$')
+ax2_B.plot(t_B, theta_2_A, color = 'gold', label = '$\\tilde{p}_B(t_n)$')
 
 
-ax1_A.legend() ; ax1_B.legend() ; ax2.legend() ; ax3.legend()
+
+
+ax2_A.set_xlabel('$t_n$') ; ax2_A.set_ylabel('$y_A(t_n)$')
+ax2_B.set_xlabel('$t_n$') ; ax2_B.set_ylabel('$y_B(t_n)$')
+
+ax0.set_xlabel('$\\Theta(t_n)_A$') ; ax0.set_ylabel('$\\tilde{p}_A(t_n)$')
+ax1.set_xlabel('$\\Theta(t_n)_B$') ; ax1.set_ylabel('$\\tilde{p}_B(t_n)$')
+
+
+ax0.legend() ; ax1.legend(); ax2_A.legend() ; ax2_B.legend()
 
 fig.suptitle('Poincare Map | $\\Theta_B(t_n)$ = 0 and $\\tilde{p}_B(t_n)$ > 0')
 

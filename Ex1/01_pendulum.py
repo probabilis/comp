@@ -78,7 +78,7 @@ m = 1
 l = 1
 g = 9.81
 omega = np.sqrt(g/l)
-y0 = np.array([np.pi/3, 0])
+y0 = np.array([np.pi/30, 0])
 t0 = 0
 t_max = 10
 epsilon = 0.05
@@ -115,7 +115,7 @@ eps_list = [0.01, 0.05, 0.1]
 fig, axs = plt.subplots(2, len(eps_list), sharex = 'col', figsize = (8,10))
 
 #ode system for pendulum
-def hamiltonian(f, t):
+def ode_double_pendulum(f, t):
     l = 1
     g = 9.81
     omega = np.sqrt(g/l)
@@ -131,8 +131,8 @@ def comparison_erk_eul(eps_list):
     t_max = 10
 
     for i, eps in enumerate(eps_list):
-        y_rk4, t_rk4 = explicit_runge_kutta(hamiltonian, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
-        y_eul, t_eul = explicit_runge_kutta(hamiltonian, y0, t0, t_max, eps, a_eul, b_eul, c_eul)
+        y_rk4, t_rk4 = explicit_runge_kutta(ode_double_pendulum, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
+        y_eul, t_eul = explicit_runge_kutta(ode_double_pendulum, y0, t0, t_max, eps, a_eul, b_eul, c_eul)
 
         E_t_rk4 = 0.5*m*l**2*y_rk4[1,:]**2 + m*g*l*(1 - np.cos(y_rk4[0,:]))
         E_t_eul = 0.5*m*l**2*y_eul[1,:]**2 + m*g*l*(1 - np.cos(y_eul[0,:]))
@@ -179,22 +179,23 @@ from scipy.signal import blackman
 fig, axs = plt.subplots(2, figsize = (8,10))
 
 t0 = 0
-y0 = np.array([np.pi/3, 0])
-t_max = 100
+y0 = np.array([np.pi/300000, 0])
+t_max = 20
 eps = 0.05
 
-y_rk4, t_rk4 = explicit_runge_kutta(hamiltonian, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
+y_rk4, t_rk4 = explicit_runge_kutta(ode_double_pendulum, y0, t0, t_max, eps, a_rk4, b_rk4, c_rk4)
 
 N = len(t_rk4)
-yf = fft(y_rk4[0,:])
-xf = fftfreq(N, eps)[:N//2]
+yf = fft(y_rk4[0,:])[:N//2]
+xf = fftfreq(N, eps)[0:N//2]
 
 axs[0].plot(t_rk4, y_rk4[0,:], label = 'RK4')
 
 axs[0].set_xlabel('time $t$ / s')
 axs[0].set_ylabel('$\\Theta$(t)')
 
-axs[1].plot(xf, 2.0/N * np.abs(yf[0:N//2]), color = 'lightblue')
+
+axs[1].plot(xf, 2.0/N * np.abs(yf), color = 'lightblue')
 
 axs[1].set_xlabel('frequency $\\omega$ / $s^{-1}$')
 axs[1].set_ylabel('|FFT|')
