@@ -83,31 +83,24 @@ g = 1
 
 y0_A = np.array([0, 0, 4, 2])
 t0_A = 0
-t_max_A = 360
+t_max_A = 10
 epsilon_A = 0.01
 
 y_A, t_A = explicit_runge_kutta(dSdt, y0_A, t0_A, t_max_A, epsilon_A, a_rk4, b_rk4, c_rk4)
 
 theta_1_A, theta_2_A, p_1_A, p_2_A = y_A
 
-#plt.plot(t_A, theta_1_A, color = 'blue')
-#plt.plot(t_A, theta_2_A, color = 'orange')
-#plt.plot(t_A, p_2_A, color = 'green')
-
 #----------------------------------
 
 y0_B = np.array([0, 0, 0, 4])
 y0_B = np.array([1, 0, 0, 4])
 t0_B = 0
-t_max_B = 360
+t_max_B = 10
 epsilon_B = 0.01
 
 y_B, t_B = explicit_runge_kutta(dSdt, y0_B, t0_B, t_max_B, epsilon_B, a_rk4, b_rk4, c_rk4)
 
 theta_1_B, theta_2_B, p_1_B, p_2_B = y_B
-
-plt.plot(t_B, theta_1_B, color = 'blue')
-plt.plot(t_B, theta_2_B, color = 'orange')
 
 #---------------------------------
 
@@ -120,7 +113,7 @@ def find_crossing_points(data1, data2):
         if data1[i] // (np.pi) > 0:
 
             #print(data1[i])
-            data1[i] = data1[i] - data1[i] // (2* np.pi)  * 2*np.pi
+            data1[i] = data1[i] - data1[i] // (np.pi)  * np.pi
             #print(data1[i])
             if data1[i] < 0.01 and  data2[i] > 0:
           
@@ -132,9 +125,9 @@ def find_crossing_points(data1, data2):
                     indices.append(i)
          
 
-        elif data1[i] // (- np.pi) > 0:
+        elif data1[i] // (- np.pi ) > 0:
             #print(data1[i])
-            data1[i] = abs(data1[i]) - abs(data1[i] // (2* np.pi))  * 2*np.pi
+            data1[i] = abs(data1[i]) - abs(data1[i] // np.pi) * np.pi
             #print(data1[i])
             if abs(data1[i]) < 0.01 and  data2[i] > 0:
                 
@@ -157,19 +150,50 @@ def find_crossing_points(data1, data2):
     return np.array(indices)
 
 relevant_points_A = find_crossing_points(theta_2_A, p_2_A)
-
-plt.figure(figsize = (6,4), dpi = 300)
-plt.ylim([0,5])
-plt.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
-         marker = 'o', markersize = 3)
-plt.show()
-
 relevant_points_B = find_crossing_points(theta_2_B, p_2_B)
 
-plt.figure(figsize = (6,4), dpi = 300)
-plt.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
-         marker = 'o', markersize = 3)
-plt.show()
+def annotate_axes(ax, text, fontsize=18):
+    ax.text(0.5, 0.5, text, transform=ax.transAxes,
+            ha="center", va="center", fontsize=fontsize, color="darkgrey")
+
+fig = plt.figure(figsize=(8, 10), layout="constrained")
+spec = fig.add_gridspec(3, 2)
+
+ax1_A = fig.add_subplot(spec[0, :])
+annotate_axes(ax1_A, '$\\Theta(t_n)_A$ $\\tilde{p}_A(t_n)$')
+
+ax1_B = fig.add_subplot(spec[1, :])
+annotate_axes(ax1_B, '$\\Theta(t_n)_B$ $\\tilde{p}_B(t_n)$')
+
+ax2 = fig.add_subplot(spec[2, 0])
+annotate_axes(ax2, '$\\Theta_A(t)$')
+
+ax3 = fig.add_subplot(spec[2, 1])
+annotate_axes(ax3, '$\\Theta_B(t)$')
+
+ax1_A.plot(t_B, theta_1_A, color = 'midnightblue', label = '$\\Theta_A(t)$')
+ax1_A.plot(t_B, theta_2_A, color = 'mediumseagreen', label = '$\\tilde{p}_A(t_n)$')
+
+ax1_B.plot(t_B, theta_1_A, color = 'salmon', label = '$\\Theta_A(t)$')
+ax1_B.plot(t_B, theta_2_A, color = 'gold', label = '$\\tilde{p}_A(t_n)$')
+
+ax2.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
+         marker = 'o', markersize = 3, label = '$\\Theta_A(t)$', color = 'midnightblue')
+
+ax3.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
+         marker = 'o', markersize = 3, label = '$\\Theta_B(t)$', color = 'salmon')
+
+
+ax1_A.set_xlabel('$t_n$') ; ax1_A.set_ylabel('$y(t_n)$')
+ax1_B.set_xlabel('$t_n$') ; ax1_B.set_ylabel('$y(t_n)$')
+
+ax2.set_xlabel('$\\Theta(t_n)_A$') ; ax2.set_ylabel('$\\tilde{p}_A(t_n)$')
+ax3.set_xlabel('$\\Theta(t_n)_B$') ; ax3.set_ylabel('$\\tilde{p}_B(t_n)$')
+
+
+ax1_A.legend() ; ax1_B.legend() ; ax2.legend() ; ax3.legend()
+
+fig.suptitle('Poincare Map | $\\Theta_B(t_n)$ = 0 and $\\tilde{p}_B(t_n)$ > 0')
 
 
 
