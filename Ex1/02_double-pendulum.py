@@ -76,13 +76,10 @@ def dSdt(S, t):
 
 # ---------------------------------
 t0 = 0 
-t_max = 100
+t_max = 1000
 
 epsilon = 0.01
 ###################################
-
-m = 1 ; l = 1 ; g = 1
-
 
 y0_A = np.array([0, 0, 4, 2])
 t0_A = t0
@@ -96,7 +93,6 @@ theta_1_A, theta_2_A, p_1_A, p_2_A = y_A
 #----------------------------------
 
 y0_B = np.array([0, 0, 0, 4])
-y0_B = np.array([1, 0, 0, 4])
 t0_B = t0
 t_max_B = t_max
 epsilon_B = epsilon
@@ -112,44 +108,22 @@ def find_crossing_points(data1, data2):
     if abs(data1[0]) < 10**(-10):
         indices.append(0)
     for i in range(1,len(data1)-1):
+        
+        if data1[i] % (2 * np.pi ) > 0 and data1[i] > (2 * np.pi ) :
+            print(data1[i])
+            if (data1[i] % (2 * np.pi )) < 0.01 and data2[i] > 0:
+                indices.append(i)
 
-        if data1[i] // (np.pi) > 0:
-
-            #print(data1[i])
-            data1[i] = data1[i] - data1[i] // (np.pi)  * np.pi
-            #print(data1[i])
-            if data1[i] < 0.01 and  data2[i] > 0:
-          
-                if abs(data1[i]) > abs(data1[i-1]):
-                    indices.append(i-1)
-                elif abs(data1[i]) > abs(data1[i+1]):
-                    indices.append(i+1)
-                else:
-                    indices.append(i)
-         
-
-        elif data1[i] // (- np.pi ) > 0:
-            #print(data1[i])
-            data1[i] = abs(data1[i]) - abs(data1[i] // np.pi) * np.pi
-            #print(data1[i])
-            if abs(data1[i]) < 0.01 and  data2[i] > 0:
-                
-                if abs(data1[i]) > abs(data1[i-1]):
-                    indices.append(i-1)
-                elif abs(data1[i]) > abs(data1[i+1]):
-                    indices.append(i+1)
-                else:
-                    indices.append(i)
-               
+        elif (((data1[i] < 0) and (data1[i+1] > 0)) or ((data1[i] > 0) and (data1[i+1] < 0))) and data2[i] > 0:
+            if abs(data1[i]) > abs(data1[i-1]):
+                indices.append(i-1)
+            elif abs(data1[i]) > abs(data1[i+1]):
+                indices.append(i+1)
+            else:
+                indices.append(i)
         else:
-            if (((data1[i] < 0) and (data1[i+1] > 0)) or ((data1[i] > 0) and (data1[i+1] < 0))) and data2[i] > 0:
-                
-                if abs(data1[i]) > abs(data1[i-1]):
-                    indices.append(i-1)
-                elif abs(data1[i]) > abs(data1[i+1]):
-                    indices.append(i+1)
-                else:
-                    indices.append(i)
+            None
+
     return np.array(indices)
     
 #############################################################################
@@ -164,42 +138,52 @@ def annotate_axes(ax, text, fontsize=18, color="darkgrey"):
 fig = plt.figure(figsize=(8, 10), layout="constrained")
 spec = fig.add_gridspec(3, 2)
 
-
-
 ax0 = fig.add_subplot(spec[0, 0])
-annotate_axes(ax0, '$\\Theta_A(t)$')
+annotate_axes(ax0, 'non-chaotic')
 
 ax1 = fig.add_subplot(spec[0, 1])
-annotate_axes(ax1, '$\\Theta_B(t)$')
+annotate_axes(ax1, 'chaotic')
 
-ax2_A = fig.add_subplot(spec[1, :])
-ax2_B = fig.add_subplot(spec[2, :])
+ax2 = fig.add_subplot(spec[1, :])
+ax3 = fig.add_subplot(spec[2, :])
 
 ax0.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
-         marker = 'o', markersize = 3, label = '$\\Theta_A(t)$', color = 'midnightblue')
+         marker = 'o', markersize = 3, label = '$\\Theta_1(t)$', color = 'midnightblue')
 
 ax1.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
-         marker = 'o', markersize = 3, label = '$\\Theta_B(t)$', color = 'salmon')
+         marker = 'o', markersize = 3, label = '$\\Theta_1(t)$', color = 'salmon')
 
-ax2_A.plot(t_B, theta_1_A, color = 'midnightblue', label = '$\\Theta_A(t)$')
-ax2_A.plot(t_B, theta_2_A, color = 'mediumseagreen', label = '$\\tilde{p}_A(t_n)$')
+ax2.plot(t_A, theta_1_A, color = 'midnightblue', label = '$\\Theta_1(t)$')
+ax2.plot(t_A, p_1_A, color = 'mediumseagreen', label = '$\\tilde{p}_1(t_n)$')
+ax2.plot(t_A, theta_2_A, color = 'or ange', label = '$\\Theta_2(t)$')
+ax2.plot(t_A, p_2_A, color = 'skyblue', label = '$\\tilde{p}_2(t_n)$')
 
-ax2_B.plot(t_B, theta_1_A, color = 'salmon', label = '$\\Theta_B(t)$')
-ax2_B.plot(t_B, theta_2_A, color = 'gold', label = '$\\tilde{p}_B(t_n)$')
-
-
-
-
-ax2_A.set_xlabel('$t_n$') ; ax2_A.set_ylabel('$y_A(t_n)$')
-ax2_B.set_xlabel('$t_n$') ; ax2_B.set_ylabel('$y_B(t_n)$')
-
-ax0.set_xlabel('$\\Theta(t_n)_A$') ; ax0.set_ylabel('$\\tilde{p}_A(t_n)$')
-ax1.set_xlabel('$\\Theta(t_n)_B$') ; ax1.set_ylabel('$\\tilde{p}_B(t_n)$')
+ax3.plot(t_B, theta_1_B, color = 'midnightblue', label = '$\\Theta_1(t)$')
+ax3.plot(t_B, p_1_B, color = 'mediumseagreen', label = '$\\tilde{p}_1(t_n)$')
+ax3.plot(t_B, theta_2_B, color = 'orange', label = '$\\Theta_2(t)$')
+ax3.plot(t_B, p_2_B, color = 'skyblue', label = '$\\tilde{p}_2(t_n)$')
 
 
-ax0.legend() ; ax1.legend(); ax2_A.legend() ; ax2_B.legend()
 
-fig.suptitle('Poincare Map | $\\Theta_B(t_n)$ = 0 and $\\tilde{p}_B(t_n)$ > 0')
+ax0.set_xlabel('$\\Theta_1(t_n)$') ; ax0.set_ylabel('$\\tilde{p}_1(t_n)$')
+ax1.set_xlabel('$\\Theta_1(t_n)$') ; ax1.set_ylabel('$\\tilde{p}_1(t_n)$')
+
+ax2.set_xlabel('$t_n$') ; ax2.set_ylabel('$y_A(t_n)$')
+ax2.set_xlabel('$t_n$') ; ax2.set_ylabel('$y_A(t_n)$')
+
+ax1.set_xlim(-1.5,1.5)
+
+ax0.legend() ; ax1.legend(); ax2.legend() ; ax3.legend()
+
+
+ax0.title.set_text('Non-Chaotic Pendulum')
+ax1.title.set_text('Chaotic Pendulum')
+
+ax2.title.set_text('Motion $y(t_n)$ for Non-Chaotic Double-Pendulum')
+ax3.title.set_text('Motion $y(t_n)$ for Chaotic Double-Pendulum')
+
+
+fig.suptitle('Poincare Map | $\\Theta_2(t_n)$ = 0 and $\\tilde{p}_2(t_n)$ > 0')
 
 
 
