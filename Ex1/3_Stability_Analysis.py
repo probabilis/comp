@@ -146,9 +146,16 @@ def Plotting_Stability(y0_list):
     
     
 Plotting_Stability(y0_list)
-
+k = 0
 for ax, i in zip(axs, y0_list):
+    k = k + 1
     ax.set_xlabel('$t / s$'.format(i))
+    if k < 4:
+        ax.title.set_text('non-chaotic')
+    else:
+        ax.title.set_text('chaotic')
+
+
 axs[0].set_ylabel('$\delta(t)$')
 
 
