@@ -1,12 +1,22 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 13 13:00:04 2022
 
-@author: Sebastian
-"""
+# 2 - Double Pendulum
+
+# Created by:
+# *Maximilian Gschaider
+# *Sebastian Grosinger
+# *Florian Wallner
+
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+
+#############################################
+#############################################
+#############################################
+
+# General Explicit Runge Kutta Method and RK4-parameters of the Butcher tableau
+
 
 a_rk4 = np.array([[0,0,0,0],
                   [0.5,0,0,0],
@@ -49,160 +59,212 @@ def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
     return y, t
 
 
-def dSdt(S, t):
-    
-    l = 1
-    g = 9.81
+#############################################
+#############################################
+#############################################
+
+# b) Solving the Double-Pendulum numerically with the RK4-Method
+
+
+def Double_Pendulum(D, t, l = 1, g = 9.8067):
+    """
+    Returns the system of ODE's of a double pendulum with:
+        * m = 1
+        * l = 1
+        * g = 9.8067
+    The output is a numpy array
+    """
+
     omega = np.sqrt(g/l)
-    theta_1, theta_2, p_tilde_1, p_tilde_2 = S
+    theta1, theta2, p1, p2 = D
     
-    denominator = 1 + np.sin(theta_1-theta_2)**2
+    denominator = (1 + np.sin(theta1 - theta2)**2)
+    theta1_der = (p1 - p2*np.cos(theta1 - theta2)) / denominator
+    theta2_der = (2*p2 - p1*np.cos(theta1 - theta2)) / denominator
     
-    A_num = p_tilde_1*p_tilde_2*np.sin(theta_1 - theta_2)
-    A_den = denominator
-    A = A_num/A_den
+    A = (p1*p2*np.sin(theta1 - theta2)) / denominator
+    B = ((p1**2 + 2*p2**2 - 2*p1*p2*np.cos(theta1 - theta2))*np.sin(theta1 - theta2)*np.cos(theta1 - theta2)) / (denominator**2) 
     
-    B_num = p_tilde_1**2 + 2*p_tilde_2**2 - 2*p_tilde_1*p_tilde_2*np.cos(theta_1 - theta_2)
-    B_den = denominator**2
-    B_fac = np.sin(theta_1 - theta_2)*np.cos(theta_1 - theta_2)
-    B = (B_num/B_den)*B_fac
+    p1_der = B - A - 2*omega**2*np.sin(theta1)
+    p2_der = A - B - omega**2*np.sin(theta2)
     
-    theta_1_der = (p_tilde_1 - p_tilde_2*np.cos(theta_1 - theta_2))/denominator
-    theta_2_der = 2*p_tilde_2 - p_tilde_1*np.cos(theta_1 - theta_2)/denominator
-    p_tilde_1_der = -A + B - 2*omega**2*np.sin(theta_1)
-    p_tilde_2_der = A - B - omega**2*np.sin(theta_2)
+    return np.array([theta1_der, theta2_der, p1_der, p2_der])
+
+
+# 4 different initial conditions
+y0_list = [np.array([1, 0, 0, 3]), np.array([0, 0, 4, 2]),
+           np.array([0, 0, 0, 4]), np.array([0, 0, 0, 5])]
+
+# define plotting layout
+fig, axs = plt.subplots(2, len(y0_list), figsize = (20,10))
+
+
+def Plotting_Double_Pendulum(y0_list):
+    t0 = 0
+    tmax = 60
+    epsilon = 0.01
     
-    return np.array([theta_1_der, theta_2_der, p_tilde_1_der, p_tilde_2_der])
-
-# ---------------------------------
-t0 = 0 
-t_max = 1000
-
-epsilon = 0.01
-###################################
-
-y0_A = np.array([0, 0, 4, 2])
-t0_A = t0
-t_max_A = t_max
-epsilon_A = epsilon
-
-y_A, t_A = explicit_runge_kutta(dSdt, y0_A, t0_A, t_max_A, epsilon_A, a_rk4, b_rk4, c_rk4)
-
-theta_1_A, theta_2_A, p_1_A, p_2_A = y_A
-
-#----------------------------------
-
-y0_B = np.array([0, 0, 0, 4])
-t0_B = t0
-t_max_B = t_max
-epsilon_B = epsilon
-
-y_B, t_B = explicit_runge_kutta(dSdt, y0_B, t0_B, t_max_B, epsilon_B, a_rk4, b_rk4, c_rk4)
-
-theta_1_B, theta_2_B, p_1_B, p_2_B = y_B
-
-#---------------------------------
-
-def find_crossing_points(data1, data2):
-    indices = []
-    if abs(data1[0]) < 10**(-10):
-        indices.append(0)
-    for i in range(1,len(data1)-1):
+    for i, y0 in enumerate(y0_list):
+        y, t = explicit_runge_kutta(Double_Pendulum, y0, t0, tmax, epsilon, a_rk4, b_rk4, c_rk4)
+        theta1, theta2, p1, p2 = y
         
-        if data1[i] % (2 * np.pi ) > 0 and data1[i] > (2 * np.pi ) :
-            print(data1[i])
-            if (data1[i] % (2 * np.pi )) < 0.01 and data2[i] > 0:
-                indices.append(i)
+        axs_theta = axs[0, i]
+        axs_p = axs[1, i]
+        
+        axs_theta.plot(theta1, theta2, color = 'blue')
+        axs_p.plot(p1, p2, color = 'green')
+    return
 
-        elif (((data1[i] < 0) and (data1[i+1] > 0)) or ((data1[i] > 0) and (data1[i+1] < 0))) and data2[i] > 0:
-            if abs(data1[i]) > abs(data1[i-1]):
-                indices.append(i-1)
-            elif abs(data1[i]) > abs(data1[i+1]):
-                indices.append(i+1)
-            else:
-                indices.append(i)
-        else:
-            None
 
+Plotting_Double_Pendulum(y0_list)
+
+for ax_top, ax_bot, i in zip(axs[0], axs[-1], y0_list):
+    ax_top.set_title('$\\theta_1(0) = %1.f$, $\\theta_2(0) = %1.f$, $p_1(0) = %1.f $, $p_2(0) = %1.f$' %(i[0], i[1], i[2], i[3]))
+    ax_top.set_xlabel('$\\theta_1(t)$'.format(i))
+    ax_bot.set_xlabel('$p_1(t)$'.format(i))
+axs[0,0].set_ylabel('$\\theta_2(t)$')
+axs[1,0].set_ylabel('$p_2(t)$')
+
+fig.suptitle('Double Pendulum - Numerical Solution using RK4 with various Initial Conditions', fontsize = 24)
+fig.tight_layout()
+#fig.savefig('double_pendulum.png')
+plt.show()
+
+
+#############################################
+#############################################
+#############################################
+
+# c) Poicare Maps with chaotic and non-chaotic initial conditions
+
+
+def Poincare_Points(data1, data2, epsilon):
+    """Function that returns all indices where data1 = 0 and data2 > 0"""
+    
+    indices = []
+    for i in range(len(data1) - 1):
+        if (((abs(data1[i]) % (2*np.pi)) < epsilon) or ((2*np.pi - (abs(data1[i]) % (2*np.pi))) < epsilon)) and data2[i] > 0:
+            indices.append(i)
+            
     return np.array(indices)
+
+
+y0_list = [np.array([1, 0, 0, 3]), np.array([0, 0, 4, 2]),
+           np.array([0, 0, 0, 4]), np.array([0, 0, 0, 5])]
+
+#define plotting layout
+fig, axs = plt.subplots(1, len(y0_list), figsize = (20,5))
+
+
+def Plotting_Poincare(y0_list):
+    t0 = 0
+    tmax = 360
+    epsilon = 0.01
     
-#############################################################################
-
-relevant_points_A = find_crossing_points(theta_2_A, p_2_A)
-relevant_points_B = find_crossing_points(theta_2_B, p_2_B)
-
-def annotate_axes(ax, text, fontsize=18, color="darkgrey"):
-    ax.text(0.5, 0.5, text, transform=ax.transAxes,
-            ha="center", va="center", fontsize=fontsize, color="darkgrey")
-
-fig = plt.figure(figsize=(8, 10), layout="constrained")
-spec = fig.add_gridspec(3, 2)
-
-ax0 = fig.add_subplot(spec[0, 0])
-annotate_axes(ax0, 'non-chaotic')
-
-ax1 = fig.add_subplot(spec[0, 1])
-annotate_axes(ax1, 'chaotic')
-
-ax2 = fig.add_subplot(spec[1, :])
-ax3 = fig.add_subplot(spec[2, :])
-
-ax0.plot(theta_1_A[relevant_points_A], p_1_A[relevant_points_A], linestyle = 'none',
-         marker = 'o', markersize = 3, label = '$\\Theta_1(t)$', color = 'midnightblue')
-
-ax1.plot(theta_1_B[relevant_points_B], p_1_B[relevant_points_B], linestyle = 'none',
-         marker = 'o', markersize = 3, label = '$\\Theta_1(t)$', color = 'salmon')
-
-ax2.plot(t_A, theta_1_A, color = 'midnightblue', label = '$\\Theta_1(t)$')
-ax2.plot(t_A, p_1_A, color = 'mediumseagreen', label = '$\\tilde{p}_1(t_n)$')
-ax2.plot(t_A, theta_2_A, color = 'or ange', label = '$\\Theta_2(t)$')
-ax2.plot(t_A, p_2_A, color = 'skyblue', label = '$\\tilde{p}_2(t_n)$')
-
-ax3.plot(t_B, theta_1_B, color = 'midnightblue', label = '$\\Theta_1(t)$')
-ax3.plot(t_B, p_1_B, color = 'mediumseagreen', label = '$\\tilde{p}_1(t_n)$')
-ax3.plot(t_B, theta_2_B, color = 'orange', label = '$\\Theta_2(t)$')
-ax3.plot(t_B, p_2_B, color = 'skyblue', label = '$\\tilde{p}_2(t_n)$')
-
-
-
-ax0.set_xlabel('$\\Theta_1(t_n)$') ; ax0.set_ylabel('$\\tilde{p}_1(t_n)$')
-ax1.set_xlabel('$\\Theta_1(t_n)$') ; ax1.set_ylabel('$\\tilde{p}_1(t_n)$')
-
-ax2.set_xlabel('$t_n$') ; ax2.set_ylabel('$y_A(t_n)$')
-ax2.set_xlabel('$t_n$') ; ax2.set_ylabel('$y_A(t_n)$')
-
-ax1.set_xlim(-1.5,1.5)
-
-ax0.legend() ; ax1.legend(); ax2.legend() ; ax3.legend()
-
-
-ax0.title.set_text('Non-Chaotic Pendulum')
-ax1.title.set_text('Chaotic Pendulum')
-
-ax2.title.set_text('Motion $y(t_n)$ for Non-Chaotic Double-Pendulum')
-ax3.title.set_text('Motion $y(t_n)$ for Chaotic Double-Pendulum')
-
-
-fig.suptitle('Poincare Map | $\\Theta_2(t_n)$ = 0 and $\\tilde{p}_2(t_n)$ > 0')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    for i, y0 in enumerate(y0_list):
+        y, t = explicit_runge_kutta(Double_Pendulum, y0, t0, tmax, epsilon, a_rk4, b_rk4, c_rk4)
+        theta1, theta2, p1, p2 = y
+        relevant_points = Poincare_Points(theta2, p2, epsilon)
+        
+        axs_poincare = axs[i]
+        
+        axs_poincare.plot(theta1[relevant_points], p1[relevant_points], 
+                          color = 'crimson', linestyle = 'none', marker = 'o',
+                          markersize = 1.5)
+    return
     
     
+Plotting_Poincare(y0_list)
+
+for ax, i in zip(axs, y0_list):
+    ax.set_title('$\\theta_1(0) = %1.f$, $\\theta_2(0) = %1.f$, $p_1(0) = %1.f $, $p_2(0) = %1.f$' %(i[0], i[1], i[2], i[3]))
+    ax.set_xlabel('$\\theta_1(t)$'.format(i))
+axs[0].set_ylabel('$p_1(t)$')
+
+
+fig.suptitle('Poincare Maps - Numerical Solution using RK4 with various Initial Conditions', fontsize = 24)
+fig.tight_layout()
+fig.savefig('poincare_double_pendulum.png')
+plt.show()
+
+
+#############################################
+#############################################
+#############################################
+
+# d) Verifying the conservation of energy
+
+
+# With this command an offset between plot and title is set (there was an overlap)
+from matplotlib import rcParams
+rcParams['axes.titlepad'] = 20 
+
+
+def Hamiltonian(theta1, theta2, p1_tilde, p2_tilde, m = 1, l = 1, g = 9.8067):
+    """Returns the total energy of a double pendulum"""
+    
+    p1 = p1_tilde*m*l**2
+    p2 = p2_tilde*m*l**2
+    
+    T = (1/(2*m*l**2))*(p1**2 + 2*p2**2 - 2*p1*p2*np.cos(theta1 - theta2))/(1 + np.sin(theta1 - theta2)**2)
+    U = m*g*l*(4 - 2*np.cos(theta1) - np.cos(theta2))
+    H = T + U
+    
+    return H
+
+
+y0_list = [np.array([1, 0, 0, 3]), np.array([0, 0, 4, 2]),
+           np.array([0, 0, 0, 4]), np.array([0, 0, 0, 5])]
+
+#define plotting layout
+fig, axs = plt.subplots(1, len(y0_list), figsize = (20,5))
+
+
+def Plotting_Energy(y0_list):
+    t0 = 0
+    tmax = 60
+    epsilon = 0.01
+    
+    for i, y0 in enumerate(y0_list):
+        y, t = explicit_runge_kutta(Double_Pendulum, y0, t0, tmax, epsilon, a_rk4, b_rk4, c_rk4)
+        theta1, theta2, p1_tilde, p2_tilde = y
+        
+        Energy = Hamiltonian(theta1, theta2, p1_tilde, p2_tilde)
+        
+        axs_energy = axs[i]
+        
+        axs_energy.plot(t, Energy, color = 'cyan')
+    return
     
     
+Plotting_Energy(y0_list)
+
+for ax, i in zip(axs, y0_list):
+    ax.set_title('$\\theta_1(0) = %1.f$, $\\theta_2(0) = %1.f$, $p_1(0) = %1.f $, $p_2(0) = %1.f$' %(i[0], i[1], i[2], i[3]))
+    ax.set_xlabel('$t / s$'.format(i))
+axs[0].set_ylabel('$E(t)$')
+
+
+fig.suptitle('Double Pendulum - Verifying the Conservation of Energy', fontsize = 24)
+fig.tight_layout()
+#fig.savefig('poincare_double_pendulum.png')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
