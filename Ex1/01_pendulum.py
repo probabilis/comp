@@ -215,7 +215,7 @@ axs[0].legend(loc = 'upper right')
 
 plt.show()
 
-print('$T$ = {:.3f}'.format(osc_fr) + '  $s$')
+print('Periodendauer T = {:.3f}'.format(osc_fr) + '  s')
 
 
 
