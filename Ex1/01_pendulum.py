@@ -206,7 +206,7 @@ axs[1].plot(xf, 2.0/N * np.abs(yf), color = 'lightblue')
 
 axs[1].set_xlabel('frequency $\\omega$ / $s^{-1}$')
 axs[1].set_ylabel('| FFT |')
-axs[1].text(3, 0.5, '$\\omega$ = {:.3f}'.format(osc_fr) + '  $s^{-1}$', fontsize = 10)
+axs[1].text(3, 0.5, '$T$ = {:.3f}'.format(osc_fr) + '  $s$', fontsize = 10)
 
 
 fig.suptitle('Resolving the swinging periodicity $\\omega$')
@@ -215,7 +215,7 @@ axs[0].legend(loc = 'upper right')
 
 plt.show()
 
-print('$\\omega$ = {:.3f}'.format(osc_fr) + '  $s^{-1}$')
+print('$T$ = {:.3f}'.format(osc_fr) + '  $s$')
 
 
 
