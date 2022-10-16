@@ -178,7 +178,7 @@ Plotting_Poincare(y0_list)
 
 for ax, i in zip(axs, y0_list):
     ax.set_title('$\\theta_1(0) = %1.f$, $\\theta_2(0) = %1.f$, $p_1(0) = %1.f $, $p_2(0) = %1.f$' %(i[0], i[1], i[2], i[3]))
-    ax.set_xlabel('$\\theta_1(t)$'.format(i))
+    ax.set_xlabel('$\\theta_1j(t)$'.format(i))
 axs[0].set_ylabel('$p_1(t)$')
 
 
