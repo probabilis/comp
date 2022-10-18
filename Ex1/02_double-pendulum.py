@@ -9,13 +9,13 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+#importing the global General-Explicit RK algorithm from the project folder
+from runge_kutta import explicit_runge_kutta 
+#importing the global Double-Pendulum differential equations
+from double_pendulum_de import Double_Pendulum
 
 
-#############################################
-#############################################
-#############################################
-
-# General Explicit Runge Kutta Method and RK4-parameters of the Butcher tableau
+#RK4-parameters of the Butcher tableau
 
 
 a_rk4 = np.array([[0,0,0,0],
@@ -28,67 +28,11 @@ b_rk4 = np.array([1/6, 1/3, 1/3, 1/6])
 c_rk4 = np.array([0, 0.5, 0.5, 1])
 
 
-def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
-    
-    nr_y = y0.size
-    
-    t = np.arange(t0, t_max, epsilon)
-    nr_t = t.size
-    
-    y = np.zeros((nr_y, nr_t))
-    y[:,0] = y0
-    
-    d = c.size
-    k = np.zeros((nr_y, nr_t, d))
-    
-    for n in range(nr_t - 1):
-        
-        for i in range(0,d):
-            delta_k = 0
-            for j in range(d):
-                delta_k += a[i,j]*F(k[:,n,j], t[n] + c[j]*epsilon)
-                
-            k[:,n,i] = y[:,n] + epsilon*delta_k
-            
-        delta_y = 0
-        for j in range(d):
-            delta_y += b[j]*F(k[:,n,j], t[n] + epsilon*c[j])
-            
-        y[:,n+1] = y[:,n] + epsilon*delta_y
-        
-    return y, t
-
-
 #############################################
 #############################################
 #############################################
 
 # b) Solving the Double-Pendulum numerically with the RK4-Method
-
-
-def Double_Pendulum(D, t, l = 1, g = 9.8067):
-    """
-    Returns the system of ODE's of a double pendulum with:
-        * m = 1
-        * l = 1
-        * g = 9.8067
-    The output is a numpy array
-    """
-
-    omega = np.sqrt(g/l)
-    theta1, theta2, p1, p2 = D
-    
-    denominator = (1 + np.sin(theta1 - theta2)**2)
-    theta1_der = (p1 - p2*np.cos(theta1 - theta2)) / denominator
-    theta2_der = (2*p2 - p1*np.cos(theta1 - theta2)) / denominator
-    
-    A = (p1*p2*np.sin(theta1 - theta2)) / denominator
-    B = ((p1**2 + 2*p2**2 - 2*p1*p2*np.cos(theta1 - theta2))*np.sin(theta1 - theta2)*np.cos(theta1 - theta2)) / (denominator**2) 
-    
-    p1_der = B - A - 2*omega**2*np.sin(theta1)
-    p2_der = A - B - omega**2*np.sin(theta2)
-    
-    return np.array([theta1_der, theta2_der, p1_der, p2_der])
 
 
 # 4 different initial conditions
@@ -136,7 +80,6 @@ plt.show()
 #############################################
 
 # c) Poicare Maps with chaotic and non-chaotic initial conditions
-
 
 def Poincare_Points(data1, data2, epsilon):
     """Function that returns all indices where data1 = 0 and data2 > 0"""
