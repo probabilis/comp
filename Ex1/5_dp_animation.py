@@ -34,13 +34,13 @@ c_rk4 = np.array([0, 0.5, 0.5, 1])
 
 #input:
 ############################
-theta1_der_0 = 1
-theta2_der_0 = 0
-p1_der_0 = 0
-p2_der_0 = 3
+theta1_0 = 1
+theta2_0 = 0
+p1_0 = 0
+p2_0 = 3
 ############################
 ############################
-y0 = np.array([theta1_der_0, theta2_der_0, p1_der_0, p2_der_0])
+y0 = np.array([theta1_0, theta2_0, p1_0, p2_0])
 ############################
 
 #initializing parameters
@@ -102,7 +102,7 @@ def animate(i):
 
 ani = FuncAnimation(fig, animate, len(t), interval=epsilon*1000, blit=True)
 
-ax.set_title('Double Pendulum Simulation with I.C.: $\\dot{\\theta}_1$ = %1.f, $\\dot{\\theta}_2$ = %1.f, $\\dot{p}_1$ = %1.f, $\\dot{p}_2$ = %.f' %(theta1_der_0, theta2_der_0, p1_der_0, p2_der_0), fontsize = 10)
+ax.set_title('Double Pendulum Simulation with I.C.: $\\theta_1$ = %1.f, $\\theta_2$ = %1.f, $p_1$ = %1.f, $p_2$ = %.f' %(theta1_0, theta2_0, p1_0, p2_0), fontsize = 10)
 
 
 ani.save("dp_animation.gif", dpi=100, writer=PillowWriter(fps=100))
