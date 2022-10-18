@@ -5,6 +5,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+#importing the global General-Explicit RK algorithm from the project folder
+from runge_kutta import explicit_runge_kutta 
 
 
 #coefficients for each numerical method S
@@ -25,53 +27,6 @@ a_eul = np.array([[0]])
 b_eul = np.array([1])
 
 c_eul = np.array([0])
-
-
-
-#explicit Runge Kutta method for solving systems of ordinary differential equations
-
-def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
-    """
-    input parameters:
-    F(y,t) = array of 1 order d.e. functions
-    y0 = initial condition in y
-    t0 = initial condition in t
-    t_max = maximal time of 
-    epsilon = incremental size of differentation
-    a, b, c = coefficients for specific method
-
-    output:
-    y, t = solution vector  in y and time vector t
-    """
-    
-    nr_y = y0.size
-    
-    t = np.arange(t0, t_max, epsilon)
-    nr_t = t.size
-    
-    y = np.zeros((nr_y, nr_t))
-    y[:,0] = y0
-    
-    d = c.size
-    k = np.zeros((nr_y, nr_t, d))
-    
-    for n in range(nr_t - 1):
-        
-        for i in range(0,d):
-            delta_k = 0
-            for j in range(d):
-                delta_k += a[i,j]*F(k[:,n,j], t[n] + c[j]*epsilon)
-                
-            k[:,n,i] = y[:,n] + epsilon*delta_k
-            
-        delta_y = 0
-        for j in range(d):
-            delta_y += b[j]*F(k[:,n,j], t[n] + epsilon*c[j])
-            
-        y[:,n+1] = y[:,n] + epsilon*delta_y
-        
-    return y, t
-
 
 
 #############################################
@@ -103,8 +58,6 @@ plt.xlabel('$t$ / s')
 plt.ylabel('$\\Theta(t)$')
 plt.legend()
 plt.title('Solving the pendulum differential equation')
-
-
 
 
 #############################################
