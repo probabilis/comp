@@ -1,4 +1,4 @@
-#Runge Kutta Function Modul for CP Project
+#Runge Kutta Adaptive Time Stepping with Double Stepping
 
 import numpy as np
 
