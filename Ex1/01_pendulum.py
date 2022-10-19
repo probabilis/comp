@@ -40,7 +40,7 @@ def ode_simple_pendulum(f, t):
     omega = np.sqrt(g/l)
     theta, p = f
 
-    return np.array([p , -omega**2 * np.sin(theta)])
+    return np.array([p, -omega**2 * np.sin(theta)])
 
 
 #initial conditions

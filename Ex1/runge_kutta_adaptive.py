@@ -39,10 +39,10 @@ def explicit_runge_kutta_adaptive(F, y0, t0, t_max, epsilon, a, b, c):
     #t = np.arange(t0, t[n], epsilon)
     #nr_t = t.size
 
-    y_tol = 0.001
-    eps_min = 0.0001
+    y_tol = 0.01
+    eps_min = 0.001
 
-    dy_min = 0.001
+    dy_min = 0.00001
     dy_max = 0.01
 
     t_vec_max = round((t_max - t0) / eps_min) * 3 
@@ -93,7 +93,6 @@ def explicit_runge_kutta_adaptive(F, y0, t0, t_max, epsilon, a, b, c):
 
         print('Epsilon', epsilon)
 
-        print('_dy=', y[:,n+1])
         #criteria for de- or increasing epsilon for the worst (= min./max.) value in each ODE system
         if (np.max(np.abs( y[:,n+1] )) < y_tol ):
             if (epsilon != eps_min):
@@ -102,11 +101,11 @@ def explicit_runge_kutta_adaptive(F, y0, t0, t_max, epsilon, a, b, c):
             y_new = y[:,n+1]
         
         else:
-            if (np.abs( y[:,n+1] ) > y_tol and np.abs( y[:,n+1] - y_half[:,n+1] ) / np.abs(y[:,n+1] ) > dy_max):
+            if ( np.min(np.abs( y[:,n+1] )) > y_tol and np.min(np.abs( y[:,n+1] - y_half[:,n+1] ) / np.abs(y[:,n+1] )) > dy_max):
                 epsilon = epsilon / 2
                 print("New step size 2 ", epsilon)
                 y_new = y_half[:, n+1]
-            elif ((np.abs( y[:, n+1] )) > y_tol  and (np.abs(y[:,n+1] - y_double[:,n+1] ) / np.abs(y[:,n+1] )) < dy_min ):
+            elif ( np.min(np.abs( y[:, n+1] )) > y_tol  and np.max(np.abs(y[:,n+1] - y_double[:,n+1] ) / np.abs(y[:,n+1] )) < dy_min ):
                 epsilon = 2 * epsilon
                 print("New step size 3 ", epsilon)
                 y_new = y_double[:, n+1]
@@ -128,7 +127,7 @@ def ode_simple_pendulum(f, t):
     omega = np.sqrt(g/l)
     theta, p = f
 
-    return np.array([-omega**2 * np.sin(theta)])
+    return np.array([p, -omega**2 * np.sin(theta)])
 
 
 #initial conditions

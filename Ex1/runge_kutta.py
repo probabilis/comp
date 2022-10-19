@@ -34,14 +34,12 @@ def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
         
         for i in range(0,d):
             delta_k = 0
-            for j in range(d):
-                delta_k += a[i,j]*F(k[:,n,j], t[n] + c[j]*epsilon)
+            delta_k = np.sum(a[i,:]*F(k[:,n,:], t[n] + c[:]*epsilon), axis = 1) 
                 
             k[:,n,i] = y[:,n] + epsilon*delta_k
             
         delta_y = 0
-        for j in range(d):
-            delta_y += b[j]*F(k[:,n,j], t[n] + epsilon*c[j])
+        delta_y = np.sum(b[:]*F(k[:,n,:], t[n] + epsilon*c[:]), axis = 1) 
             
         y[:,n+1] = y[:,n] + epsilon*delta_y
         
