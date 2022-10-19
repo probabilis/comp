@@ -1,4 +1,4 @@
-#Runge Kutta Adaptive Time Stepping with Double Stepping
+#Runge Kutta Adaptive Time Stepping with Felhberg Method
 
 import numpy as np
 import matplotlib.pyplot as plt
