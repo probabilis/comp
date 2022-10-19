@@ -2,8 +2,6 @@
 
 import numpy as np
 
-
-
 def explicit_runge_kutta(F, y0, t0, t_max, epsilon, a, b, c):
     """
     input parameters:
