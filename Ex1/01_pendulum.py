@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 #importing the global General-Explicit RK algorithm from the project folder
 from runge_kutta import explicit_runge_kutta 
 
-
 #coefficients for each numerical method S
 
 #RK4 method
