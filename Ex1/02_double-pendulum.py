@@ -1,4 +1,3 @@
-
 # 2 - Double Pendulum
 
 # Created by:
