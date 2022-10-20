@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 # 3 - Stability Analysis
 
@@ -96,7 +97,7 @@ axs[0].set_ylabel('$\delta(t)$')
 
 fig.suptitle('Stability Analysis - 3 non-chaotic and 3 chaotic initial conditions', fontsize = 24)
 fig.tight_layout()
-#fig.savefig('poincare_double_pendulum.png')
+#fig.savefig('double-pendulum_stability-analysis.png')
 plt.show()
 
 

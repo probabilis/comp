@@ -1,4 +1,10 @@
-#Runge Kutta Function Modul for CP Project
+# -*- coding: utf-8 -*-
+#General Runge-Kutta Function Modul for CP Project for solving linear-diff.eq systems 
+
+# Created by:
+# *Maximilian Gschaider
+# *Sebastian Grosinger
+# *Florian Wallner
 
 import numpy as np
 

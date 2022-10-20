@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # 2 - Double Pendulum
 
 # Created by:
@@ -126,7 +128,7 @@ axs[0].set_ylabel('$p_1(t)$')
 
 fig.suptitle('Poincare Maps - Numerical Solution using RK4 with various Initial Conditions', fontsize = 24)
 fig.tight_layout()
-fig.savefig('poincare_double_pendulum.png')
+#fig.savefig('poincare_double_pendulum.png')
 plt.show()
 
 
@@ -189,7 +191,7 @@ axs[0].set_ylabel('$E(t)$')
 
 fig.suptitle('Double Pendulum - Verifying the Conservation of Energy', fontsize = 24)
 fig.tight_layout()
-#fig.savefig('poincare_double_pendulum.png')
+#fig.savefig('poincare_double_pendulum_conservation-of-energy.png')
 plt.show()
 
 

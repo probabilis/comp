@@ -1,7 +1,11 @@
-##01 - A simple Pendulum
-#General Runge-Kutta solver for linear-diff.eq systems
-
 # -*- coding: utf-8 -*-
+
+##01 - A simple Pendulum
+
+# Created by:
+# *Maximilian Gschaider
+# *Sebastian Grosinger
+# *Florian Wallner
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -57,6 +61,7 @@ plt.xlabel('$t$ / s')
 plt.ylabel('$\\Theta(t)$')
 plt.legend()
 plt.title('Solving the pendulum differential equation')
+#plt.savefig('rk4-euler_comparison.png')
 
 
 #############################################
@@ -112,7 +117,7 @@ axs[1,0].set_ylabel('E(t)')
 
 fig.suptitle('Pendulum - System Energy E(t) and $\\Theta$(t) for different values of $\\epsilon$ for Euler and RK4')
 fig.tight_layout()
-#fig.savefig('pendulum.png')
+#fig.savefig('pendulum_theta_system-energy_over_epsilon.png')
 plt.show
 
 
@@ -164,8 +169,10 @@ axs[1].text(3, 0.5, '$T$ = {:.3f}'.format(osc_fr) + '  $s$', fontsize = 10)
 fig.suptitle('Resolving the swinging periodicity $\\omega$')
 fig.tight_layout()
 axs[0].legend(loc = 'upper right')
+#fig.savefig('rk4_FFT-plot.png')
 
 plt.show()
+
 
 print('Periodendauer T = {:.3f}'.format(osc_fr) + '  s')
 

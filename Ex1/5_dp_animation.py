@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
 
 # 5 - Animation
 #reference:
 #https://matplotlib.org/stable/gallery/animation/double_pendulum.html
+
+# Created by:
+# *Maximilian Gschaider
+# *Sebastian Grosinger
+# *Florian Wallner
+
 
 import numpy as np
 import matplotlib.pyplot as plt
