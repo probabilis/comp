@@ -53,3 +53,31 @@ def gauss_seidel(A, x, b, limit, tol):
 
 
 print(gauss_seidel(A, x, b, limit, tol))
+
+
+def jacobi(A, x, b, limit):
+    u = 0
+    n = len(A)
+    
+    for k in range(n):
+        if (np.sum(abs(A[k, :k])) + np.sum(abs(A[k, k+1:]))) < abs(A[k,k]):
+            u += 1
+    if u == n: 
+        for lim in range(limit):
+            sum = 0
+            for i in range(n):
+                for j in range(n):
+                    if i == j:
+                        sum += 0
+                    else:
+                        sum += A[i, j] * x[j]
+                x[i] = (b[i] - sum)/A[i,i]
+            if lim == (limit-1):
+                print('Procedure does not converge! Set your limit higher.')
+        return np.array(x)
+    
+    else:
+        text = 'The convergence criteria for matrix A is not met!'
+        return text
+
+print(jacobi(A,x,b,limit))
