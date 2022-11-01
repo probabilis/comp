@@ -86,7 +86,7 @@ def comparison_erk_eul(eps_list):
     t0 = 0
     l = 1 ; g = 9.81 ; m = 1
     omega = np.sqrt(g/l)
-    y0 = np.array([0, 2 * omega])
+    y0 = np.array([np.pi/30, 0])
     t_max = 10
 
     for i, eps in enumerate(eps_list):
@@ -173,7 +173,7 @@ axs[0].legend(loc = 'upper right')
 
 plt.show()
 
-
+# Kleinwinkelnäherung: T_0 = 2pi * sqrt(l/g) = 2 s
 print('Periodendauer T = {:.3f}'.format(osc_fr) + '  s')
 
 
