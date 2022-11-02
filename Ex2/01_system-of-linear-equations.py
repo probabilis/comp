@@ -73,18 +73,20 @@ def jacobi(A, x, b, limit):
         x_sol = []
         for lim in range(limit):
             x_sol.append(x.copy())
-            sum = 0
             x_new = np.zeros_like(x)
             for i in range(n):
+                sum = 0
                 for j in range(n):
                     if i == j:
                         sum += 0
                     else:
                         sum += A[i, j] * x[j]
                 x_new[i] = (b[i] - sum)/A[i,i]
-                if x_new[i] == x[i]:
+                if x_new[i] == x_new[i-1]:
                     break
-            if lim == (limit-1):
+            if np.allclose(x, x_new, atol=1e-10, rtol= 0):
+                break
+            if lim == (limit-1): 
                 print('Procedure does not converge! Set your limit higher.')
             x = x_new
         return np.array(x_sol)
