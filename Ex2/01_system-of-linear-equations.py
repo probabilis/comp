@@ -15,6 +15,13 @@ A = np.array([[10., -1., 2., 0.],
 
 b = np.array([6.0, 25.0, -11.0, 15.0])
 
+
+print("System:")
+for i in range(A.shape[0]):
+    row = ["{}*x{}".format(A[i, j], j + 1) for j in range(A.shape[1])]
+    print(f'{" + ".join(row)} = {b[i]}')
+print()
+
 x = np.zeros_like(b)
 
 limit = 100
@@ -63,18 +70,24 @@ def jacobi(A, x, b, limit):
         if (np.sum(abs(A[k, :k])) + np.sum(abs(A[k, k+1:]))) < abs(A[k,k]):
             u += 1
     if u == n: 
+        x_sol = []
         for lim in range(limit):
+            x_sol.append(x.copy())
             sum = 0
+            x_new = np.zeros_like(x)
             for i in range(n):
                 for j in range(n):
                     if i == j:
                         sum += 0
                     else:
                         sum += A[i, j] * x[j]
-                x[i] = (b[i] - sum)/A[i,i]
+                x_new[i] = (b[i] - sum)/A[i,i]
+                if x_new[i] == x[i]:
+                    break
             if lim == (limit-1):
                 print('Procedure does not converge! Set your limit higher.')
-        return np.array(x)
+            x = x_new
+        return np.array(x_sol)
     
     else:
         text = 'The convergence criteria for matrix A is not met!'
