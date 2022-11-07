@@ -2,14 +2,19 @@
 """
 Created on Sat Nov  5 11:17:50 2022
 
-@author: Sebastian
+@author: Blackhole
 """
 
 import numpy as np
 
-def ring(N, t, E, delta, alpha, beta):
-    
+def ring(N, t, E, E_off, delta, alpha, beta):
+    if E_off != 0:
+        off = E_off
+    else:
+        off = 0
+            
     I = np.identity(N)
+    I_off = np.identity(N) * off
     
     Delta = np.zeros((N,N))
     i = complex(0,1)
@@ -24,15 +29,11 @@ def ring(N, t, E, delta, alpha, beta):
             
             if (a == (b + 1)) or (a == (b - 1)) or (a == 0 and b == N-1) or (a == N-1 and b == 0):
                 creator_destroyer = np.zeros((N,N))
-                creator_destroyer[a,b] = t
+                creator_destroyer[a, b] = t
                 H_R = H_R + creator_destroyer
     
-    matrix = H_R - E*I + i*Delta
-    
-    #print(H_R)
+    matrix = H_R - E * I + I_off + i*Delta
     
     return matrix
 
-print(ring(N = 6, t = -2.6, E = 3, delta = 0.5, alpha = 1, beta = 4))
 
-matrix = ring(N = 6, t = -2.6, E = 3, delta = 0.5, alpha = 1, beta = 4)

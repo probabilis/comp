@@ -28,8 +28,8 @@ limit = 100
 tol = 1e-8
 
 
-def gauss_seidel(A, x, b, limit, tol):
-    
+def gauss_seidel(A, b, limit, tol):
+    x = np.zeros_like(b)
     u = 0
     n = len(A)
     
@@ -52,14 +52,16 @@ def gauss_seidel(A, x, b, limit, tol):
             if lim == (limit-1):
                 print('Procedure does not converge! Set your limit higher.')
             x = x_new
-        return np.array(x_sol)
+        return np.array(x_sol[-1])
     
     else:
         text = 'The convergence criteria for matrix A is not met!'
         return text
 
 
-print(gauss_seidel(A, x, b, limit, tol))
+print(gauss_seidel(A, b, limit, tol))
+
+
 
 
 def jacobi(A, x, b, limit):
