@@ -26,7 +26,7 @@ E_1 = -6
 E_2 = 6
 
 E_ran = np.arange(E_1, E_2 + 1, 0.1)
-E_off = 20
+E_off = complex(0,20)
 
 limit = 1000
 tol = 1e-8
@@ -51,6 +51,7 @@ def system_calc(N,t,E_ran,delta,alpha,beta, limit, tol):
     #########
     #calculation of green functions
     I = np.identity(N)
+    print(I)
 
     G_Rab = np.zeros((len(E_ran),len(alpha), N, N), dtype = object)
     #print(E_out.shape)
@@ -59,7 +60,7 @@ def system_calc(N,t,E_ran,delta,alpha,beta, limit, tol):
         for i in range(len(alpha)):
             for n in range(len(I)):
 
-                g_i = gauss_seidel(E_out[E][i], I[n], limit, tol)
+                g_i = gauss_seidel(E_out[E][i], I[n], limit, tol, weight = 1)
 
                 G_Rab[E][i][n] = g_i
 
