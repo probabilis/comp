@@ -142,8 +142,3 @@ plt.title('Comparison of Gauss-Seidel and Jacobi Method', fontsize = 16)
 plt.legend(fontsize = 12)
 plt.plot()
 
-
-
-
-    
-

@@ -48,16 +48,7 @@ N = 6
 t = -2.6
 delta = 0.5
 
-# The Gauss Seidel alghorithm does not work for E = [-5.22, 5.22].
-# The matrix is not diagonally dominant for these values!
-
-E_1 = -6
-E_2 = -5.23
-E_3 = 5.23
-E_4 = 6
-E_ran_minus = np.arange(E_1, E_2 + 0.01, 0.01)
-E_ran_plus = np.arange(E_3, E_4 + 0.01, 0.01)
-E_ran = np.concatenate((E_ran_minus, E_ran_plus), axis = None)
+E_ran = np.arange(-6, 6.1, 0.1 )
 
 limit = 1000
 tol = 1e-8
@@ -66,28 +57,33 @@ tol = 1e-8
 def system_calc(N,t,E_ran,delta,alpha,beta, limit, tol):
     
     ring_matrices = np.zeros((len(E_ran),len(alpha)), dtype = object)
+    
+    I = np.identity(N)
 
     #calculation of the ring matrices for different E_i and alpha/beta
     for j, E in enumerate(E_ran):
         k = -1
         for a, b in zip(alpha,beta):
             k += 1
-            ring_matrices[j][k] = ring(N, t, E, delta, a, b)[0]
+            # complex energy shift of the ring matrices
+            ring_matrices[j][k] = ring(N, t, E, delta, a, b)[0] + complex(0,20)*I
             
             
     #calculation of green functions
     I = np.identity(N)
-
     G_Rab = np.zeros((len(E_ran),len(alpha), N, N), dtype = object)
 
     for E in range(len(E_ran)):
         for i in range(len(alpha)):
-            for n in range(len(I)):
+            # initial guess of the Green Matrix
+            G_p = np.ones((N,N), dtype = np.cdouble)
+            # Implementing the algorithm from the discord channel
+            for p in range(1000):
+                B = I + complex(0,20)*G_p
+                for j in range(N):
+                    G_p[:,j] = gauss_seidel(ring_matrices[E][i], B[:,j], limit, tol)
 
-                g_i = gauss_seidel(ring_matrices[E][i], I[n], limit, tol)
-
-                G_Rab[E][i][n] = g_i
-            G_Rab[E][i] = (G_Rab[E][i]).T
+            G_Rab[E][i] = G_p
 
     return G_Rab, ring_matrices
 
@@ -119,7 +115,7 @@ for gr in GR_matrix[:]:
 E_ran_new = np.arange(-6, 6 + 0.01, 0.01)
 ring_matrices_new = np.zeros((len(E_ran_new),len(alpha)), dtype = object)
 
-# Plotting solutions with numpy solver which can handle all E's
+# Plotting solutions with numpy solver 
 
 for j, E in enumerate(E_ran_new):
     k = -1
