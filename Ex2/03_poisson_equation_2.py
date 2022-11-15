@@ -26,7 +26,7 @@ def nb(k, N, d):
     # finding the coefficients n_i to find neighbours
     for i in range(d):
         n[i] = k_n % N
-        k_n = k_n - n[i]
+        k_n = k_n- n[i]
         k_n = k_n/N
     
     # if a coefficient n_i is 0 or N-1, it is on the domain in the i-th dimension
@@ -119,6 +119,7 @@ plt.show()
 #############################################
 #############################################
 #############################################
+"""
 
 # d) Speed Comparison
 
@@ -126,8 +127,6 @@ limit = 100
 tol = 1e-8
 
 
-##############################################################
-#speed comparison
 
 def speed_comparison(thres,limit,tol):
     #calcualtion to the N-th (threshold as integer) linear equation systems
@@ -164,7 +163,9 @@ plt.title('Calculation Time of Gauss-Seidel Method to solve Laplace equation')
 plt.legend()
 
 
-
+#############################################
+#############################################
+#############################################
 
 
 # e) Speeding up the Gauss-Seidel alghorithm
@@ -219,9 +220,6 @@ rho[7550] = -50
 h = 0.1
 
 
-
-
-
 start_time_og = time.time()
 phi_sol = gauss_seidel(A_laplace, -h**2*rho, limit, tol)
 time_og = time.time() - start_time_og
@@ -234,3 +232,184 @@ print('time_og', time_og)
 print('time_adapt', time_adapt)
 err = np.linalg.norm(phi_sol-phi_sol_adapted)
 print(err)
+
+"""
+
+#############################################
+#############################################
+#############################################
+
+# f) Faraday Cage
+"""
+def discretized_laplace2d_faraday(N, n):
+    
+    d = 2
+    A = np.zeros((N**2 - 2*N - n*n, N**2 - 2*N - n*n))
+    I = np.identity(N**2 - 2*N - n*n)
+    A = A - 4*I
+    rho = np.zeros(N**2 - 2*N - n*n)
+    
+    #phi_known = np.zeros(N**2)
+    #phi_known[np.arange(0,N)] = 1
+    #phi_known[np.arange(N**2 - N,N**2)] = -1
+    quadrat = np.zeros(n**2)
+    i = 0
+    for x in range(36, 62):
+        for y in range(36, 62):
+            quadrat[i] = x + N*y
+            i = i + 1
+    
+    known = np.concatenate((np.arange(0, N), np.arange(N**2 - N, N**2), quadrat), axis = None)
+
+    k_unknown = np.arange(0, N**2)
+    k_unknown = np.delete(k_unknown, known)
+            
+    
+    # neighbours found by the nb function
+    for j, k in enumerate(k_unknown):
+        for i in nb(k, N, d):
+            if i < N:
+                rho[j] = rho[j] - 1
+                
+            elif i >= N**2 -N:
+                rho[j] = rho[j] + 1
+                
+            elif i in quadrat:
+                rho[j] = rho[j]
+            
+            #else:
+                #A[j][i] = 1
+    
+    # additional neighbours due to the periodic boundary conditions
+    #for i in range(N):
+        #A[i*N][i*N + N-1] = 1
+        #A[i*N + N-1][i*N] = 1
+    
+    return rho
+
+print(discretized_laplace2d_faraday(100, 26))
+
+"""
+
+def faraday_cage(i, N):
+    
+    for k in range((N//4)*N + N//4, (N//4)*N + (N*3)//4):
+        if i == k:
+            return True
+        
+    for k in range((N*3)//4 * N + N//4, (N*3)//4 * N + (N*3)//4):
+        if i == k:
+            return True
+        
+    for k in [(N//4 + i)*N + N//4 for i in range(N//2)]:
+        if i == k:
+            return True
+    
+    for k in [(N//4 + i)*N + (N*3)//4 for i in range(N//2)]:
+        if i == k:
+            return True
+        
+def nb_faraday(k, N):
+    d = 2
+    product = 1
+    neighbours_k = []
+    k_n = k
+    
+    n = np.zeros(d)
+    
+    # finding the coefficients n_i to find neighbours
+    for i in range(d):
+        n[i] = k_n % N
+        k_n = k_n- n[i]
+        k_n = k_n/N
+    
+    # if a coefficient n_i is 0 or N-1, it is on the domain in the i-th dimension
+    for i in range(d):
+        n_plus = k + product
+        n_minus = k - product
+        if n[i] == 0:
+            neighbours_k.append(n_plus)
+        if n[i] == (N-1):
+            neighbours_k.append(n_minus)
+        if (n[i] > 0) and (n[i] < N-1):
+            neighbours_k.append(n_plus)
+            neighbours_k.append(n_minus)
+        
+        product = product*N
+        
+    for i in range(N):
+        if i in neighbours_k:
+            neighbours_k.remove(i)
+    for i in range(N**2 - N, N**2):
+        if i in neighbours_k:
+            neighbours_k.remove(i)
+                  
+    if n[0] == 0:
+        neighbours_k.append(k + N -1)
+    if n[0] == N-1:
+        neighbours_k.append(k -N + 1)
+        
+    return np.array(neighbours_k)
+    
+        
+def faraday_laplace(N):
+    
+    A = np.zeros((N**2 - 2*N, N**2 - 2*N))
+    
+    for i in range(N, N**2 - N):
+        if faraday_cage(i,N) == True:
+            A[i-N, i-N] = 1
+        else:
+            A[i-N, i-N] = -4
+            A[i-N, nb_faraday(i, N) - N] = 1
+    
+    return A
+            
+N = 40
+
+A_faraday = faraday_laplace(N)
+
+
+
+
+
+rho = np.zeros(N**2 - 2*N)
+
+rho[np.arange(0,N)] = -1
+
+rho[np.arange(N**2 - 3*N, N**2 - 2*N)] = 1
+
+phi_lower = np.zeros(N) + 1
+phi_upper = np.zeros(N) - 1
+
+phi_sol_lim = gauss_seidel(A_faraday, rho, 100, 1e-8)
+
+phi_sol = np.concatenate((phi_lower, phi_sol_lim, phi_upper))
+
+x_list = []
+
+y_list = []
+
+for k in range(N**2): 
+    x = k % N
+    y = (k - x)/N
+    x_list.append(x)
+    y_list.append(y)
+    
+
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, dpi = 200)
+surf = ax.plot_trisurf(x_list, y_list, phi_sol, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+ax.set_xlabel('$x$')
+ax.set_ylabel('$y$')
+ax.set_zlabel('$\\phi(x,y)$')
+plt.show()
+
+
+ 
+
+
+        
+    
+
+
