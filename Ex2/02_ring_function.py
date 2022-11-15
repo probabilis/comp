@@ -22,7 +22,7 @@ def ring(N, t, E, delta, alpha, beta):
     for a in range(N):
         for b in range(N):
             
-            if (a == (b + 1)) or (a == (b - 1)) or (a == 0 and b == N-1) or (a == N-1 and b == 0):
+            if (a == (b + 1)) or (a == (b - 1)) or (a == 0 and b == N-1) or (a == N-1 and b == 0) :
                 creator_destroyer = np.zeros((N,N))
                 creator_destroyer[a,b] = t
                 H_R = H_R + creator_destroyer
