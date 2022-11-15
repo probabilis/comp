@@ -1,11 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Nov  5 11:17:50 2022
+# 04 - Electron transmission through a molecular transport system BONUS
 
-@author: Sebastian
-"""
+# Created by:
+# *Maximilian Gschaider
+# *Sebastian Grosinger
+# *Florian Wallner
 
 import numpy as np
+import matplotlib.pyplot as plt
+from gauss_seidel import gauss_seidel
+
+# b) ring function to return the complex matrix (H_R - EI + i*Delta)
 
 def ring(N, t, E, delta, alpha, beta):
     
@@ -16,7 +20,6 @@ def ring(N, t, E, delta, alpha, beta):
     Delta[alpha-1, alpha-1] = delta
     Delta[beta-1, beta-1] = delta
     
-    
     H_R = np.zeros((N,N))
     
     for a in range(N):
@@ -25,16 +28,144 @@ def ring(N, t, E, delta, alpha, beta):
                 creator_destroyer = np.zeros((N,N))
                 creator_destroyer[a,b] = t
                 H_R = H_R + creator_destroyer
-            if (a == (b + 2)) or (a == (b - 2)) or (a == 0 and b = (N - 2)) or (a == (N-2) and b == 0):
-                creator_destroyer[a,b] = t/2
-                H_R = H_R + creator_destroyer
+
+        #further hopping processes - 2 steps are allowed for the electron transmission: transmissio prob. t -> t/2
+
+            if (a == (b + 2)) or (a == (b - 2)) or (a == 0 and b == (N - 2)) or (a == (N-2) and b == 0) or (a == N-1 and b == 1) or (a == 1 and b == N - 1):
+
+                creator_destroyer2 = np.zeros((N,N))
+                creator_destroyer2[a,b] = t/2
+                H_R = H_R + creator_destroyer2
     
     matrix = H_R - E*I + i*Delta
     
-    #print(H_R)
+    return matrix, H_R
+
+
+#############################################
+#############################################
+#############################################
+
+# c) solving for G_R for two different systems in E = [-6, 6]
+
+# Input parameters 
+
+alpha = [1,1] 
+beta = [3,4]
+N = 6
+t = -2.6
+delta = 0.5
+
+E_ran = np.arange(-6, 7, 1 )
+
+limit = 1000
+tol = 1e-8
+
+
+def system_calc(N,t,E_ran,delta,alpha,beta, limit, tol):
     
-    return matrix
+    ring_matrices = np.zeros((len(E_ran),len(alpha)), dtype = object)
+    
+    I = np.identity(N)
 
-print(ring(N = 6, t = -2.6, E = 3, delta = 0.5, alpha = 1, beta = 4))
+    #calculation of the ring matrices for different E_i and alpha/beta
+    for j, E in enumerate(E_ran):
+        k = -1
+        for a, b in zip(alpha,beta):
+            k += 1
+            # complex energy shift of the ring matrices
+            ring_matrices[j][k] = ring(N, t, E, delta, a, b)[0] + complex(0,100)*I
+            
+            
+    #calculation of green functions
+    I = np.identity(N)
+    G_Rab = np.zeros((len(E_ran),len(alpha), N, N), dtype = object)
 
-matrix = ring(N = 6, t = -2.6, E = 3, delta = 0.5, alpha = 1, beta = 4)
+    for E in range(len(E_ran)):
+        for i in range(len(alpha)):
+            # initial guess of the Green Matrix
+            G_p = np.ones((N,N), dtype = np.cdouble)
+            # Implementing the algorithm from the discord channel
+            for p in range(1000):
+                B = I + complex(0,100)*G_p
+                for j in range(N):
+                    G_p[:,j] = gauss_seidel(ring_matrices[E][i], B[:,j], limit, tol)
+
+            G_Rab[E][i] = G_p
+
+    return G_Rab, ring_matrices
+
+
+GR_matrix, ring_matrices = system_calc(N,t,E_ran,delta,alpha,beta, limit, tol)
+
+
+#############################################
+#############################################
+#############################################
+
+# d) Plotting the transmission probability T_alpha_beta
+
+fig, axs = plt.subplots(2, 2, figsize = (16,16))
+
+axs_1 = axs[0,0]
+axs_2 = axs[0,1]
+axs_3 = axs[1,0]
+axs_4 = axs[1,1]
+
+# Plotting solutions with Gauss_Seidel
+
+k = -1
+for gr in GR_matrix[:]:
+    k += 1
+    axs_1.plot(E_ran[k], abs(gr[0][0][2])**2, '.', color = 'salmon', label = '$\\alpha = 1, \\beta = 3$')
+    axs_2.plot(E_ran[k], abs(gr[1][0][3])**2, '.', color = 'aqua',label =  '$\\alpha = 1, \\beta = 4$')
+
+E_ran_new = np.arange(-6, 6 + 0.01, 0.01)
+ring_matrices_new = np.zeros((len(E_ran_new),len(alpha)), dtype = object)
+
+# Plotting solutions with numpy solver 
+
+for j, E in enumerate(E_ran_new):
+    k = -1
+    for a, b in zip(alpha,beta):
+        k += 1
+        ring_matrices_new[j][k] = ring(N, t, E, delta, a, b)[0]
+
+for i in range(len(E_ran_new)):
+    g_i1 = np.linalg.inv(ring_matrices_new[i][0])
+    g_i2 = np.linalg.inv(ring_matrices_new[i][1])
+    axs_3.plot(E_ran_new[i], abs(g_i1[0][2])**2, '.', color = 'salmon')
+    axs_4.plot(E_ran_new[i], abs(g_i2[0][3])**2, '.', color = 'aqua')
+
+axs_1.set_title('Transmission probability $T_{13}(E)$ with Gauss_Seidel')
+axs_2.set_title('Transmission probability $T_{14}(E)$ with Gauss_Seidel')
+axs_3.set_title('Transmission probability $T_{13}(E)$ with Numpy-Solver')
+axs_4.set_title('Transmission probability $T_{14}(E)$ with Numpy-Solver')
+
+axs_3.set_xlabel('E')
+axs_4.set_xlabel('E')
+
+axs_1.set_ylabel('Transmission probability $T_{\\alpha\\beta}(E)$')
+axs_3.set_ylabel('Transmission probability $T_{\\alpha\\beta}(E)$')
+
+
+# Calculating the eigenvalues of H_R
+
+H_R = ring(N, t, E, delta, alpha[0], beta[0])[1]
+eigenvalues = np.linalg.eigvals(H_R)
+
+print('Eigenwerte H_R = ', eigenvalues)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
