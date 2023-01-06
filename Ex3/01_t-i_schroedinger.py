@@ -92,7 +92,6 @@ def solve_schroedinger(psi_ic, schroedinger1, eps_a, eps_b, s_min, s_max, epsilo
         psi_b, _ = explicit_runge_kutta(schroedinger1, psi_ic, s_min, s_max, epsilon, a_rk4, b_rk4, c_rk4)
 
         psi_a = psi_a[0]; psi_b = psi_b[0]
-
         #condition 1:
         if psi_a[-1] * psi_b[-1] > 0:
 
@@ -353,7 +352,7 @@ def calc_and_plot(solve_schroedinger, s_min=-0.5, s_max=0.5, epsilon=0.01):
                 if abs(y[-1]) < 0.1:
 
                     I_0 = 1 / len(y) * np.sum(abs(y) ** 2)
-                    y_norm = y / np.sqrt(2 * I_0)
+                    y_norm = y / np.sqrt(I_0)
 
                     y_arr[i] = y_norm
 
@@ -368,9 +367,9 @@ def calc_and_plot(solve_schroedinger, s_min=-0.5, s_max=0.5, epsilon=0.01):
                     axs[0][j].set_title('n = %1d' % (j + 1))
 
                     # <s>
-                    s_ev[i][j] = (abs(s_min) + s_max) ** 2 * (1 / len(s) * np.sum(s[:] * abs(y[:]) ** 2))
+                    s_ev[i][j] = (1 / len(s) * np.sum(s[:] * abs(y_norm[:]) ** 2))
 
-                    s_ev_2[i][j] = (abs(s_min) + s_max) ** 2 * (1 / len(s) * np.sum((s[:])** 2 * abs(y[:]) ** 2))
+                    s_ev_2[i][j] = (1 / len(s) * np.sum((s[:])**2 * abs(y_norm[:]) ** 2))
 
                     boundary = True
                 else:
@@ -386,7 +385,7 @@ def calc_and_plot(solve_schroedinger, s_min=-0.5, s_max=0.5, epsilon=0.01):
 
     # calculation of var(s) through <s^2> - <s>^2
 
-    var_s = s_ev_2 - s_ev ** 2
+    var_s = s_ev_2 - abs(s_ev) ** 2
 
     df_s_var = pd.DataFrame(np.round(var_s, 5), columns=['n=1', 'n=2', 'n=3', 'n=4', 'n=5'])
 
